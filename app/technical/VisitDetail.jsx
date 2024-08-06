@@ -19,6 +19,7 @@ export default function VisitDetail({ route }) {
   const [visitDetails, setVisitDetails] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [imageUri, setImageUri] = useState(null);
+  const [sound, setSound] = useState();
 
   const params = route.params;
   const defaultImage = require("../../assets/images/icon.png");
@@ -54,30 +55,39 @@ export default function VisitDetail({ route }) {
   };
 
   const handlePlayAudio = async () => {
-    const fileUri = `${FileSystem.cacheDirectory}audio_example.wav`;
+    const fileUri = `${FileSystem.cacheDirectory}audio_example.mp3`;
 
     try {
       await FileSystem.writeAsStringAsync(fileUri, visitDetails.nota_voz, {
         encoding: FileSystem.EncodingType.Base64,
       });
-
       const { sound } = await Audio.Sound.createAsync({ uri: fileUri });
 
       await sound.playAsync();
+
+      sound.setOnPlaybackStatusUpdate(async (status) => {
+        if (status.didJustFinish) {
+          await sound.unloadAsync();
+        }
+      });
     } catch (error) {
       console.error("Error al reproducir el audio:", error);
     }
   };
 
   const decodeBase64Image = async () => {
-    if (visitDetails.foto_evidencia) {
-      const uri = `${FileSystem.documentDirectory}image.jpg`;
-      await FileSystem.writeAsStringAsync(uri, visitDetails.foto_evidencia, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      setImageUri(uri);
-    } else {
-      setImageUri(null);
+    try {
+      if (visitDetails.foto_evidencia) {
+        const uri = `${FileSystem.documentDirectory}image.jpg`;
+        await FileSystem.writeAsStringAsync(uri, visitDetails.foto_evidencia, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        setImageUri(uri);
+      } else {
+        setImageUri(null);
+      }
+    } catch (error) {
+      console.error("Error al decodificar la imagen:", error);
     }
   };
 

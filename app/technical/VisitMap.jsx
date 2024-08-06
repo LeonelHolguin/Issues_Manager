@@ -1,21 +1,34 @@
+import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import * as Location from "expo-location";
 
 export default function VisitMap({ route }) {
   const visitCoordinates = route.params.visitCoordinates;
-  const defaultVisitCoordinate = visitCoordinates[0].coordinate;
 
-  console.log(defaultVisitCoordinate);
+  useEffect(() => {
+    const getLocationPermission = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permiso de ubicación denegado");
+        return;
+      }
+    };
+
+    getLocationPermission();
+  }, []);
+
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: defaultVisitCoordinate.latitude,
-          longitude: defaultVisitCoordinate.longitude,
+          latitude: 18.4861,
+          longitude: -69.9312,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
+        provider={PROVIDER_GOOGLE}
       >
         {visitCoordinates.map((visit) => (
           <Marker

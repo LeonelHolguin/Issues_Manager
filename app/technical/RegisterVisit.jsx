@@ -61,36 +61,44 @@ const RegisterVisit = () => {
   });
 
   const handleImagePicker = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      const { uri } = result.assets[0];
-      setImage(uri);
-
-      const base64String = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: false,
+        aspect: [4, 3],
+        quality: 1,
       });
-      setBase64Image(base64String);
+
+      if (!result.canceled && result.assets.length > 0) {
+        const { uri } = result.assets[0];
+        setImage(uri);
+
+        const base64String = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        setBase64Image(base64String);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
     }
   };
 
   const startRecording = async () => {
     try {
-      await Audio.requestPermissionsAsync();
+      const permission = await Audio.requestPermissionsAsync();
+      if (permission.status !== "granted") {
+        console.error("Permission to access microphone is required!");
+        return;
+      }
+
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-      const recording = new Audio.Recording();
-      await recording.prepareToRecordAsync(
+
+      const { recording } = await Audio.Recording.createAsync(
         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
       );
-      await recording.startAsync();
       setRecording(recording);
     } catch (error) {
       console.error("Error starting recording:", error);
@@ -98,14 +106,21 @@ const RegisterVisit = () => {
   };
 
   const stopRecording = async () => {
-    setRecording(undefined);
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
-    const base64String = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    });
-    setBase64Audio(base64String);
-    setAudioUri(uri);
+    try {
+      if (recording) {
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        setAudioUri(uri);
+
+        const base64String = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        setBase64Audio(base64String);
+        setRecording(null);
+      }
+    } catch (error) {
+      console.error("Error stopping recording:", error);
+    }
   };
 
   const showDatePicker = () => {

@@ -64,17 +64,6 @@ const technicalQueries = {
     }
   },
 
-  getVideos: async () => {
-    try {
-      const response = await useFetch({
-        route: "def/videos",
-      });
-      return response;
-    } catch (error) {
-      clgError(error);
-    }
-  },
-
   getVisits: async (token) => {
     try {
       const response = await useFetch({

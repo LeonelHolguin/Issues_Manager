@@ -19,6 +19,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.rigzthan.IssuesManager",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDflv7IYrp6hZjSj_b-BkLl3RGNql0DNHc"
+        }
       }
     },
     "web": {
@@ -37,6 +44,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c371fe64-43eb-4bc9-80a4-d92844793783"
+      }
     }
   }
 }
