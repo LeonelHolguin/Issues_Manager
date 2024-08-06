@@ -17,11 +17,26 @@ const VisitInventory = () => {
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const navigation = useNavigation();
 
+  const handleMapNavigation = () => {
+    const data = visits.map((visit) => {
+      return {
+        id: visit.id,
+        coordinate: {
+          latitude: +visit.latitud,
+          longitude: +visit.longitud,
+        },
+        title: visit.motivo ?? "Sin Motivo Especificado",
+        description: visit.comentario ?? "Sin comentario especificado",
+      };
+    });
+
+    navigation.navigate("Mapa de Visitas", { visitCoordinates: data });
+  };
+
   const fetchVisits = async () => {
     try {
       const accessToken = await AsyncStorage.getItem("AccessToken");
       const response = await technicalService.getVisits(accessToken);
-
       const data = response.data;
       if (data.exito) {
         data.datos.length > 0
@@ -96,7 +111,8 @@ const VisitInventory = () => {
             </Button>
             <Button
               mode="contained"
-              onPress={() => navigation.navigate("Mapa de Visitas")}
+              disabled={visits.length <= 0}
+              onPress={handleMapNavigation}
               style={styles.button}
               contentStyle={styles.buttonContent}
             >

@@ -6,7 +6,7 @@ import { TechnicalNews } from "@/app/technical/TechnicalNews";
 import { UserInfo } from "@/app/technical/UserInfo";
 import VisitInventory from "@/app/technical/VisitInventory";
 import RegisterVisit from "@/app/technical/RegisterVisit";
-import { VisitMap } from "@/app/technical/VisitMap";
+import VisitMap from "@/app/technical/VisitMap";
 import VisitDetail from "@/app/technical/VisitDetail";
 import { WeatherState } from "@/app/technical/WeatherState";
 import { createDrawerNavigator } from "@react-navigation/drawer";
